@@ -24,27 +24,32 @@ export class ManangerUserTicketService {
         trace: trace,
       },
     };
-
-    try {
-      const response = await firstValueFrom(
-        this.httpService
-          .post(
-            `${this.appConfig.dbBaseUrl}`,
-            createManangerUserTicketDto,
-            httpOptions,
-          )
-          .pipe(
-            timeout(Number(this.appConfig.httpTimeout)),
-            retry(Number(this.appConfig.retries)),
-          ),
-      );
-      return response.data;
-    } catch (error) {
-      console.log(error);
+    if (createManangerUserTicketDto.edad > 18) {
+      try {
+        const response = await firstValueFrom(
+          this.httpService
+            .post(
+              `${this.appConfig.dbBaseUrl}`,
+              createManangerUserTicketDto,
+              httpOptions,
+            )
+            .pipe(
+              timeout(Number(this.appConfig.httpTimeout)),
+              retry(Number(this.appConfig.retries)),
+            ),
+        );
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        throw new BadRequestException(
+          `Error creando una persona : ${JSON.stringify(
+            error.response?.data || error.message,
+          )}`,
+        );
+      }
+    } else {
       throw new BadRequestException(
-        `Error creando una persona : ${JSON.stringify(
-          error.response?.data || error.message,
-        )}`,
+        `Error creando una persona : ${JSON.stringify('No es mayor de edad')}`,
       );
     }
   }
