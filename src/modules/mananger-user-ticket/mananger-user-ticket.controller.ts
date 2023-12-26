@@ -11,6 +11,7 @@ import {
 import { ManangerUserTicketService } from './mananger-user-ticket.service';
 import { CreateManangerUserTicketDto } from './dto/create-mananger-user-ticket.dto';
 import { UpdateManangerUserTicketDto } from './dto/update-mananger-user-ticket.dto';
+
 @Controller('mananger-user-ticket')
 export class ManangerUserTicketController {
   constructor(
