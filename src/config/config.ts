@@ -14,5 +14,6 @@ export default registerAs('app', () => ({
   organizationGetUrl: env.ORGANIZATION_GET,
   organizationEmailGetUrl: env.ORGANIZATION_EMAIL_GET,
   organizationGetAllUrl: env.ORGANIZATION_GET_ALL,
-  dbBaseUrl: env.DB_BASE_URL,
+  dbBaseUrl: env.DB_BASE_URL || env.DB_BASE_DOCKER_URL,
+  businessLogic: env.BUSINESS_LOGIC,
 }));

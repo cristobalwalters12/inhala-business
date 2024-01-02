@@ -24,7 +24,7 @@ export class ManangerUserTicketService {
         trace: trace,
       },
     };
-    if (createManangerUserTicketDto.edad > 18) {
+    if (createManangerUserTicketDto.edad >= +this.appConfig.businessLogic) {
       try {
         const response = await firstValueFrom(
           this.httpService
@@ -54,12 +54,13 @@ export class ManangerUserTicketService {
     }
   }
 
-  async findAll(trace: string) {
+  async findAll(trace: string, paginationDto?: any): Promise<any> {
     const httpOptions = {
       headers: {
         apiKey: this.appConfig.apiKey,
         trace: trace,
       },
+      params: paginationDto,
     };
     try {
       const response = await firstValueFrom(

@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  inhala-business:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: inhala-business-docker
+    container_name: inhala-business
+    restart: always
+    env_file:
+      - ./src/config/env/.env
+    # volumes:
+    #   - ./:/var/www/inhala-business
+    ports:
+      - 3001:3001

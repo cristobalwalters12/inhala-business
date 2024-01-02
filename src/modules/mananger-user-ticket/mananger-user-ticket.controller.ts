@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ManangerUserTicketService } from './mananger-user-ticket.service';
 import { CreateManangerUserTicketDto } from './dto/create-mananger-user-ticket.dto';
@@ -30,9 +31,16 @@ export class ManangerUserTicketController {
   }
 
   @Get()
-  async findAll(@Req() req) {
+  async findAll(
+    @Req() req,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
     const trace = req.headers.trace as string;
-    return await this.manangerUserTicketService.findAll(trace);
+    return await this.manangerUserTicketService.findAll(trace, {
+      page: page,
+      limit: limit,
+    });
   }
 
   @Get(':term')
