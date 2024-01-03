@@ -24,7 +24,7 @@ export class ManangerUserTicketService {
         trace: trace,
       },
     };
-    if (createManangerUserTicketDto.edad >= +this.appConfig.businessLogic) {
+    if (createManangerUserTicketDto.age >= +this.appConfig.businessLogic) {
       try {
         const response = await firstValueFrom(
           this.httpService

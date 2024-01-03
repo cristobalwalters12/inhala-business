@@ -3,15 +3,15 @@ import { IsInt, IsPositive, IsString, MinLength } from 'class-validator';
 export class CreateManangerUserTicketDto {
   @IsString()
   @MinLength(3)
-  nombre: string;
+  name: string;
 
   @IsString()
   @MinLength(3)
-  apellido?: string;
+  lastName?: string;
 
   @IsInt()
   @IsPositive()
-  edad?: number;
+  age?: number;
 
   @IsString()
   email?: string;
