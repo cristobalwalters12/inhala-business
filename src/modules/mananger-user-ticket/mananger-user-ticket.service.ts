@@ -14,16 +14,29 @@ export class ManangerUserTicketService {
     private readonly httpService: HttpService,
   ) {}
 
-  async create(
-    trace: string,
-    createManangerUserTicketDto: CreateManangerUserTicketDto,
-  ) {
-    const httpOptions = {
+  private generateHttpOptions(trace: string, params?: any) {
+    return {
       headers: {
         apiKey: this.appConfig.apiKey,
         trace: trace,
       },
+      params: params,
     };
+  }
+
+  private handleError(error: any, action: string) {
+    console.log(error);
+    throw new BadRequestException(
+      `Error ${action} la persona : ${JSON.stringify(
+        error.response?.data || error.message,
+      )}`,
+    );
+  }
+
+  async create(
+    trace: string,
+    createManangerUserTicketDto: CreateManangerUserTicketDto,
+  ) {
     if (createManangerUserTicketDto.age >= +this.appConfig.businessLogic) {
       try {
         const response = await firstValueFrom(
@@ -31,7 +44,7 @@ export class ManangerUserTicketService {
             .post(
               `${this.appConfig.dbBaseUrl}`,
               createManangerUserTicketDto,
-              httpOptions,
+              this.generateHttpOptions(trace),
             )
             .pipe(
               timeout(Number(this.appConfig.httpTimeout)),
@@ -40,12 +53,7 @@ export class ManangerUserTicketService {
         );
         return response.data;
       } catch (error) {
-        console.log(error);
-        throw new BadRequestException(
-          `Error creando una persona : ${JSON.stringify(
-            error.response?.data || error.message,
-          )}`,
-        );
+        this.handleError(error, 'creando');
       }
     } else {
       throw new BadRequestException(
@@ -55,77 +63,12 @@ export class ManangerUserTicketService {
   }
 
   async findAll(trace: string, paginationDto?: any): Promise<any> {
-    const httpOptions = {
-      headers: {
-        apiKey: this.appConfig.apiKey,
-        trace: trace,
-      },
-      params: paginationDto,
-    };
     try {
       const response = await firstValueFrom(
         this.httpService
-          .get(`${this.appConfig.dbBaseUrl}`, httpOptions)
-          .pipe(
-            timeout(Number(this.appConfig.httpTimeout)),
-            retry(Number(this.appConfig.retries)),
-          ),
-      );
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      throw new BadRequestException(
-        `Error listando las personas : ${JSON.stringify(
-          error.response?.data || error.message,
-        )}`,
-      );
-    }
-  }
-  async findOne(trace: string, term: string) {
-    const httpOptions = {
-      headers: {
-        apiKey: this.appConfig.apiKey,
-        trace: trace,
-      },
-    };
-    try {
-      const response = await firstValueFrom(
-        this.httpService
-          .get(`${this.appConfig.dbBaseUrl}/${term}`, httpOptions)
-          .pipe(
-            timeout(Number(this.appConfig.httpTimeout)),
-            retry(Number(this.appConfig.retries)),
-          ),
-      );
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      throw new BadRequestException(
-        `Error listando las personas : ${JSON.stringify(
-          error.response?.data || error.message,
-        )}`,
-      );
-    }
-  }
-
-  async update(
-    trace: string,
-    id: string,
-    updateManangerUserTicketDto: UpdateManangerUserTicketDto,
-  ) {
-    const httpOptions = {
-      headers: {
-        apiKey: this.appConfig.apiKey,
-        trace: trace,
-      },
-    };
-    try {
-      const response = await firstValueFrom(
-        this.httpService
-          .patch(
-            `${this.appConfig.dbBaseUrl}/${id}`,
-            updateManangerUserTicketDto,
-            httpOptions,
+          .get(
+            `${this.appConfig.dbBaseUrl}`,
+            this.generateHttpOptions(trace, paginationDto),
           )
           .pipe(
             timeout(Number(this.appConfig.httpTimeout)),
@@ -134,25 +77,18 @@ export class ManangerUserTicketService {
       );
       return response.data;
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException(
-        `Error actualizando la persona : ${JSON.stringify(
-          error.response?.data || error.message,
-        )}`,
-      );
+      this.handleError(error, 'listando las personas');
     }
   }
-  async remove(trace: string, id: string) {
-    const httpOptions = {
-      headers: {
-        apiKey: this.appConfig.apiKey,
-        trace: trace,
-      },
-    };
+
+  async findOne(trace: string, term: string) {
     try {
       const response = await firstValueFrom(
         this.httpService
-          .delete(`${this.appConfig.dbBaseUrl}/${id}`, httpOptions)
+          .get(
+            `${this.appConfig.dbBaseUrl}/${term}`,
+            this.generateHttpOptions(trace),
+          )
           .pipe(
             timeout(Number(this.appConfig.httpTimeout)),
             retry(Number(this.appConfig.retries)),
@@ -160,12 +96,50 @@ export class ManangerUserTicketService {
       );
       return response.data;
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException(
-        `Error eliminando la persona : ${JSON.stringify(
-          error.response?.data || error.message,
-        )}`,
+      this.handleError(error, 'listando las personas');
+    }
+  }
+
+  async update(
+    trace: string,
+    id: string,
+    updateManangerUserTicketDto: UpdateManangerUserTicketDto,
+  ) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService
+          .patch(
+            `${this.appConfig.dbBaseUrl}/${id}`,
+            updateManangerUserTicketDto,
+            this.generateHttpOptions(trace),
+          )
+          .pipe(
+            timeout(Number(this.appConfig.httpTimeout)),
+            retry(Number(this.appConfig.retries)),
+          ),
       );
+      return response.data;
+    } catch (error) {
+      this.handleError(error, 'actualizando');
+    }
+  }
+
+  async remove(trace: string, id: string) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService
+          .delete(
+            `${this.appConfig.dbBaseUrl}/${id}`,
+            this.generateHttpOptions(trace),
+          )
+          .pipe(
+            timeout(Number(this.appConfig.httpTimeout)),
+            retry(Number(this.appConfig.retries)),
+          ),
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error, 'eliminando');
     }
   }
 }
